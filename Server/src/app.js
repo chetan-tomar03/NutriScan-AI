@@ -1,4 +1,3 @@
-import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
@@ -7,7 +6,7 @@ const app = express();
 
 // Middleware
 app.use(helmet());
-app.use(cors());
+app.use(cors({ origin: process.env.CLIENT_ORIGIN }));
 app.use(express.json());
 
 // Health check API
