@@ -2,6 +2,8 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import { uploadImage } from "./middleware/upload.js";
+import { analyzeFoodImage, AIError } from "./services/foodAI.service.js";
+
 
 const app = express();
 
@@ -18,9 +20,15 @@ app.get("/api/health", (req, res) => {
   });
 });
 
-// TEMPORARY: remove when the real analyze route exists
-app.post("/api/analyze", uploadImage, (req, res) => {
-  res.json({ ok: true, type: req.file.detectedType, bytes: req.file.size });
+app.post("/api/analyze", uploadImage, async (req, res, next) => {
+  try {
+    const result = await analyzeFoodImage(req.file.buffer, req.file.detectedType);
+    res.json(result);
+  } catch (err) {
+    if (err instanceof AIError)
+      return res.status(err.status).json({ error: { code: err.code, message: err.message } });
+    next(err);
+  }
 });
 
 export default app;
