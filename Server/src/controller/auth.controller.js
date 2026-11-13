@@ -59,3 +59,16 @@ export async function login(req, res, next) {
     next(err);
   }
 }
+export function getMe(req, res) {
+  res.json({ user: req.user });
+}
+
+export async function deleteMe(req, res, next) {
+  try {
+    // Later : also delete this user's meals, scanUsage, weight and water logs.
+    await User.deleteOne({ _id: req.user._id });
+    res.status(204).send();
+  } catch (err) {
+    next(err);
+  }
+}
